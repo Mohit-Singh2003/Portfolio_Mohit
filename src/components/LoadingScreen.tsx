@@ -19,17 +19,17 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [progress, setProgress] = useState(0);
   const [phraseIndex, setPhraseIndex] = useState(0);
 
-  // Animate progress from 0 to 100 over ~4 seconds
+  // Animate progress from 0 to 100 over ~0.2 seconds
   useEffect(() => {
     let current = 0;
     const interval = setInterval(() => {
-      current += 1;
+      current += 5;
       if (current >= 100) {
         current = 100;
         clearInterval(interval);
       }
       setProgress(current);
-    }, 40);
+    }, 10);
 
     return () => clearInterval(interval);
   }, []);
@@ -46,7 +46,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   // Trigger exit after progress completes
   useEffect(() => {
     if (progress === 100) {
-      const timer = setTimeout(onComplete, 500);
+      const timer = setTimeout(onComplete, 100);
       return () => clearTimeout(timer);
     }
   }, [progress, onComplete]);
@@ -55,7 +55,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
     <motion.div
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.05 }}
-      transition={{ duration: 0.6, ease: "easeInOut" }}
+      transition={{ duration: 0.15, ease: "easeInOut" }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background"
     >
       {/* Subtle grid background */}

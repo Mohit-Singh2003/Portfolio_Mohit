@@ -1,9 +1,10 @@
-import React, { useRef } from "react";
-import { motion, useInView } from "motion/react";
+import React, { useRef, useState } from "react";
+import { motion, useInView, AnimatePresence } from "motion/react";
 
 export default function About() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
+  const [panelState, setPanelState] = useState<"open" | "minimized" | "maximized">("open");
 
   return (
     <section
@@ -30,7 +31,7 @@ export default function About() {
         </motion.div>
 
         {/* Summary + highlight grid */}
-        <div className="grid md:grid-cols-2 gap-12 items-start">
+        <div className={`grid gap-12 items-start ${panelState === "maximized" ? "md:grid-cols-1" : "md:grid-cols-2"}`}>
           {/* Left: prose summary */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -43,8 +44,16 @@ export default function About() {
               APIs.
             </p>
             <p className="text-muted-foreground leading-relaxed text-lg mb-6">
-              At <span className="text-foreground font-semibold">Egen</span>, I built an
-              AI analytics platform that replaced Looker Studio dashboards with
+              At{" "}
+              <a
+                href="https://www.techolution.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground font-semibold hover:text-primary transition-colors"
+              >
+                Techolution
+              </a>
+              , I built an AI analytics platform that replaced Looker Studio dashboards with
               natural-language querying, shipping supervisor agent routing,
               domain-specific SQL agents, and a secure BigQuery execution layer on GCP.
             </p>
@@ -58,21 +67,55 @@ export default function About() {
           </motion.div>
 
           {/* Right: JSON code block */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="rounded-2xl border border-border/50 bg-muted/20 overflow-hidden"
-          >
-            {/* Code block header */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/30">
-              <span className="w-3 h-3 rounded-full bg-red-500/60" />
-              <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
-              <span className="w-3 h-3 rounded-full bg-green-500/60" />
-              <span className="ml-2 text-xs font-mono text-muted-foreground">expertise.json</span>
-            </div>
-            <pre className="p-5 text-xs sm:text-sm font-mono leading-relaxed overflow-x-auto">
-              <code>
+          <AnimatePresence>
+            {panelState !== "closed" && (
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={inView ? { opacity: 1, x: 0 } : {}}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                className={`rounded-2xl border border-border/50 bg-muted/20 overflow-hidden transition-all duration-300 ${
+                  panelState === "maximized" ? "md:col-span-2" : ""
+                }`}
+              >
+                {/* Code block header */}
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/30">
+                  {/* Red — close */}
+                  <button
+                    onClick={() => setPanelState("closed" as any)}
+                    className="group w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors flex items-center justify-center"
+                    title="Close"
+                  >
+                    <span className="hidden group-hover:block text-red-900 text-[8px] font-bold leading-none">✕</span>
+                  </button>
+                  {/* Yellow — minimize */}
+                  <button
+                    onClick={() => setPanelState(panelState === "minimized" ? "open" : "minimized")}
+                    className="group w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors flex items-center justify-center"
+                    title="Minimize"
+                  >
+                    <span className="hidden group-hover:block text-yellow-900 text-[8px] font-bold leading-none">−</span>
+                  </button>
+                  {/* Green — maximize */}
+                  <button
+                    onClick={() => setPanelState(panelState === "maximized" ? "open" : "maximized")}
+                    className="group w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors flex items-center justify-center"
+                    title="Maximize"
+                  >
+                    <span className="hidden group-hover:block text-green-900 text-[8px] font-bold leading-none">+</span>
+                  </button>
+                  <span className="ml-2 text-xs font-mono text-muted-foreground">expertise.json</span>
+                </div>
+                <AnimatePresence>
+                  {panelState !== "minimized" && (
+                    <motion.pre
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="p-5 text-xs sm:text-sm font-mono leading-relaxed overflow-x-auto"
+                    >
+                      <code>
 {`{
   `}<span className="text-primary">"expertise"</span>{`: [`}
 {`
@@ -114,9 +157,13 @@ export default function About() {
 {`
   ]`}
 {`}`}
-              </code>
-            </pre>
-          </motion.div>
+                      </code>
+                    </motion.pre>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </section>
