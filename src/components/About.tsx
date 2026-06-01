@@ -4,7 +4,7 @@ import { motion, useInView, AnimatePresence } from "motion/react";
 export default function About() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
-  const [panelState, setPanelState] = useState<"open" | "minimized" | "maximized">("open");
+  const [panelState, setPanelState] = useState<"open" | "minimized" | "maximized" | "closed">("open");
 
   return (
     <section
@@ -82,7 +82,7 @@ export default function About() {
                 <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/30">
                   {/* Red — close */}
                   <button
-                    onClick={() => setPanelState("closed" as any)}
+                    onClick={() => setPanelState("closed")}
                     className="group w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors flex items-center justify-center"
                     title="Close"
                   >
